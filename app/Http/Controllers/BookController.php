@@ -104,6 +104,8 @@ class BookController extends Controller
         ";
 
         $books = DB::select($sql, $param);
+
+
          //Total
         $countSql = "SELECT COUNT(DISTINCT books.id) as total FROM books";
         if ($whereClause || $categoryFilter) {
@@ -129,6 +131,36 @@ class BookController extends Controller
             'last_page' => ceil($total / $perPage)
         ]);
         return ;
+    }
+    
+
+    public function show($id)
+    {
+        $sql = "
+            SELECT books.*, book_detail.isbn13
+            FROM books
+            LEFT JOIN book_detail ON books.id = book_detail.book_id
+            WHERE books.id = ?
+            LIMIT 1
+        ";
+        $books = DB::select($sql, [$id]);
+
+        if(empty($books))
+            return response()->json(['error' => 'Book not found'], 404);
+
+        $book = $books[0];
+
+        //Auteur
+        $authorsSql = "SELECT author_name FROM authors WHERE books_id = ?";
+        $authors = DB::select($authorsSql, [$id]);
+        $book->authors = array_column($authors, 'author_name');
+
+        //Categorie
+        $categorySql = "SELECT category_name FROM categories WHERE book_id = ?";
+        $categories = DB::select($categorySql, [$id]);
+        $book->categories = array_column($categories, 'category_name');
+
+        return response()->json($book);
     }
 }
 ?>
