@@ -162,5 +162,36 @@ class BookController extends Controller
 
         return response()->json($book);
     }
+
+    //
+    public function stats()
+    {
+        $stats = [];
+
+        //Total de livre
+        $totalBooks = DB::select("SELECT COUNT(*) as total FROM books");
+        $stats['total_books'] = $totalBooks[0]->total;
+        
+        //Note moyen
+        $avg_rating = DB::select("SELECT AVG(average_rating) as avg FROM books");
+        $stats['average_rating'] = round($avgRating[0]->avg, 2);
+
+        //Total d'auteur
+        $totalAuthors = DB::select("SELECT COUNT(DISTINCT author_name) as total FROM authors");
+        $stats['total_authors'] = $totalAuthors[0]->total;
+
+        //Total categories
+        $totalCategories = DB::select("SELECT COUNT(DISTINCT category_name) as total FROM categories");
+        $stats['total_categories'] = $totalCategories[0]->total;
+
+        //Best rating livre
+        $topRatedSql = "
+            SELECT
+                books.*,
+                
+        ";
+
+        return;
+    }
 }
 ?>
