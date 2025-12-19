@@ -188,9 +188,27 @@ class BookController extends Controller
         $topRatedSql = "
             SELECT
                 books.*,
-                
-        ";
+                GROUP_CONCAT(authors.author_name SEPARATOR ', ') as authors
+            FROM books
+            LEFT JOIN authors ON books.id = authors.books_id
+            GROUP BY books.id, books.title, books.thumbnail_url, books.description,
+                     books.published_year, books.average_rating, books.ratings_count,
+                     books.num_pages, books.popularity_score
+            ORDER BY books.average_rating DESC
+            LIMIT 1
 
+        ";
+        $topRated = DB::select($topRatedSql);
+        $stats['top_rated_book'] = !empty($topRated) ? topRated[0] : null;
+
+        $mostPopularSql = "
+            SELECT
+                books.*,
+                GROUP_CONCAT(authors.author_name SEPARATOR ', ') as authors
+            FROM books
+            LEFT JOIN authors ON books.id = authors.books_id
+            
+        ";
         return;
     }
 }
